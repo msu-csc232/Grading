@@ -10,6 +10,7 @@ expected_num_args = 4
 assignment_arg_index = 1
 assignment_num_arg_index = 2
 username_arg_index = 3
+command_line_syntax_error_code = 2
 
 if len(sys.argv) == expected_num_args:
     assignment = sys.argv[assignment_arg_index]
@@ -28,7 +29,7 @@ if len(sys.argv) == expected_num_args:
     elif assignment == "lab":
         os.chdir(script_dir + "/Labs")
     else:
-        sys.exit(2)
+        sys.exit(command_line_syntax_error_code)
 
     if os.path.isdir(clone_dir):
         rmdir_cmd = ["rm", "-rf", clone_dir]
@@ -38,8 +39,7 @@ if len(sys.argv) == expected_num_args:
     # Clone the assignment
     git_clone_cmd = ["git", "clone", "git@github.com:msu-csc232/{0}.git".format(clone_dir)]
     current_process = subprocess.run(git_clone_cmd, stdout=subprocess.PIPE, encoding="utf-8")
-    git_output = current_process.stdout
-    print(git_output)
+    print(current_process.stdout)
 
     # Navigate into cloned directory
     os.chdir(clone_dir)
@@ -47,8 +47,8 @@ if len(sys.argv) == expected_num_args:
     # Check out the develop branch
     git_checkout_cmd = ["git", "checkout", "develop"]
     current_process = subprocess.run(git_checkout_cmd, stdout=subprocess.PIPE, encoding="utf-8")
-    git_output = current_process.stdout
-    print(git_output)
+    current_process_output = current_process.stdout
+    print(current_process.stdout)
 
     # Navigate into a builder directory
     # At least two different paths have been specified in the past so we'll try either one...
@@ -97,4 +97,4 @@ else:
     print("Usage:", sys.argv[0], "assignment number username")
     print("\twhere assignment = [hw|lab],\n\tnumber = [1|2|...|12]")
     print("\tusername is the student's GitHub username...")
-    sys.exit(2)  # Command-line syntax error
+    sys.exit(command_line_syntax_error_code)  # Command-line syntax error
