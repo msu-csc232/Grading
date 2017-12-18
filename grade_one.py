@@ -3,6 +3,7 @@
 import os
 import subprocess
 import sys
+import platform
 
 from pathlib import Path
 
@@ -11,6 +12,7 @@ assignment_arg_index = 1
 assignment_num_arg_index = 2
 username_arg_index = 3
 command_line_syntax_error_code = 2
+OS = platform.system()
 
 if len(sys.argv) == expected_num_args:
     assignment = sys.argv[assignment_arg_index]
