@@ -13,10 +13,11 @@ assignment_num_arg_index = 2
 username_arg_index = 3
 command_line_syntax_error_code = 2
 OS = platform.system()
+print(OS)
 
 
 def make_wpath(path):
-    str.replace("/", "\\")
+    return path.replace("/", "\\")
 
 if len(sys.argv) == expected_num_args:
     assignment = sys.argv[assignment_arg_index]
@@ -26,7 +27,6 @@ if len(sys.argv) == expected_num_args:
         number = sys.argv[assignment_num_arg_index]
     username = sys.argv[username_arg_index]
 
-    #repository = assignment + number + "-" + username
     script_dir = os.getcwd()
     clone_dir = assignment + number + "-" + username
 
@@ -46,17 +46,17 @@ if len(sys.argv) == expected_num_args:
     if os.path.isdir(clone_dir):
         if OS == "Darwin" or OS == "Linux":
             rmdir_cmd = ["rm", "-rf", clone_dir]
-            current_process = subprocess.run(rmdir_cmd, stdout=subprocess.PIPE, encoding="utf-8")
+            current_process = subprocess.run(rmdir_cmd, stdout=subprocess.PIPE)
             print(current_process.stdout)
         else:
             rmdir_cmd = ["rd", "/s", "/q", clone_dir]
-            current_process = subprocess.run(rmdir_cmd, stdout=subprocess.PIPE, encoding="utf-8")
+            current_process = subprocess.run(rmdir_cmd, stdout=subprocess.PIPE)
             print(current_process.stdout)
 
     # Clone the assignment
-    git_clone_cmd = ["git", "clone", "https://git@github.com/msu-csc232/{0}.git".format(clone_dir)]
+    print(username)
+    git_clone_cmd = ["git", "clone", "https://github.com/msu-csc232/{0}.git".format(clone_dir)]
     print(git_clone_cmd)
-    #current_process = subprocess.run(git_clone_cmd, stdout=subprocess.PIPE, encoding="utf-8")
     current_process = subprocess.run(git_clone_cmd, stdout=subprocess.PIPE)
     print(current_process.stdout)
 
@@ -65,7 +65,7 @@ if len(sys.argv) == expected_num_args:
 
     # Check out the develop branch
     git_checkout_cmd = ["git", "checkout", "develop"]
-    current_process = subprocess.run(git_checkout_cmd, stdout=subprocess.PIPE, encoding="utf-8")
+    current_process = subprocess.run(git_checkout_cmd, stdout=subprocess.PIPE)
     current_process_output = current_process.stdout
     print(current_process.stdout)
 
@@ -87,49 +87,39 @@ if len(sys.argv) == expected_num_args:
 
     # cmake -G "Unix Makefiles" ../..
     cmake_cmd = ["cmake", "-G", "Unix Makefiles", "../.."]
-    current_process = subprocess.run(cmake_cmd, stdout=subprocess.PIPE, encoding="utf-8")
+    current_process = subprocess.run(cmake_cmd, stdout=subprocess.PIPE)
     print(current_process.stdout)
 
     # make
     make_cmd = ["make"]
-    current_process = subprocess.run(make_cmd, stdout=subprocess.PIPE, encoding="utf-8")
+    current_process = subprocess.run(make_cmd, stdout=subprocess.PIPE)
     print(current_process.stdout)
 
-    if OS == "Darwin" or OS == "Linux":
-        main_exe = Path("../../out/{0}{1}".format(assignment, number))
-        demo_exe = Path(".")  # dummy initialization
-        test_exe = Path(".")  # dummy initialization
+    main_exe = Path("../../out/{0}{1}".format(assignment, number))
+    main_exe_string = "../../out/{0}{1}".format(assignment, number)
+    demo_exe = Path(".")  # dummy initialization
+    test_exe = Path(".")  # dummy initialization
 
-        if main_exe.is_file():
-            demo_exe = Path("../../out/{0}{1}Demo".format(assignment, number))
-            test_exe = Path("../../out/{0}{1}Test".format(assignment, number))
-        elif Path("../../out/{0}{1}".format("%s%s" % (assignment[0].upper(), assignment[1:]), number)).is_file():
-            # Just in case the assignment was capitalized in the CMakeLists.txt file...
-            assignment = "%s%s" % (assignment[0].upper(), assignment[1:])
-            main_exe = Path("../../out/{0}{1}".format(assignment, number))
-            demo_exe = Path("../../out/{0}{1}Demo".format(assignment, number))
-            test_exe = Path("../../out/{0}{1}Test".format(assignment, number))
-    else:
-        main_exe = Path("..\\..\\out\\{0}{1}".format(assignment, number))
-        demo_exe = Path(".")  # dummy initialization
-        test_exe = Path(".")  # dummy initialization
-
-        if main_exe.is_file():
-            demo_exe = Path("..\\..\\out/{0}{1}Demo".format(assignment, number))
-            test_exe = Path("..\\..\\out/{0}{1}Test".format(assignment, number))
-        elif Path("..\\..\\out/{0}{1}".format("%s%s" % (assignment[0].upper(), assignment[1:]), number)).is_file():
-            # Just in case the assignment was capitalized in the CMakeLists.txt file...
-            assignment = "%s%s" % (assignment[0].upper(), assignment[1:])
-            main_exe = Path("..\\..\\out/{0}{1}".format(assignment, number))
-            demo_exe = Path("..\\..\\out/{0}{1}Demo".format(assignment, number))
-            test_exe = Path("..\\..\\out/{0}{1}Test".format(assignment, number))
+    if main_exe.is_file():
+        demo_exe = "../../out/{0}{1}Demo".format(assignment, number)
+        test_exe = "../../out/{0}{1}Test".format(assignment, number)
+    elif Path("../../out/{0}{1}".format("%s%s" % (assignment[0].upper(), assignment[1:]), number)).is_file():
+        # Just in case the assignment was capitalized in the CMakeLists.txt file...
+        assignment = "%s%s" % (assignment[0].upper(), assignment[1:])
+        main_exe_string = "../../out/{0}{1}".format(assignment, number)
+        demo_exe = "../../out/{0}{1}Demo".format(assignment, number)
+        test_exe = "../../out/{0}{1}Test".format(assignment, number)
+    if OS == "Windows":
+        main_exe_string = make_wpath(main_exe_string)
+        demo_exe = make_wpath(demo_exe)
+        test_exe = make_wpath(test_exe)
 
     # Execute the programs
-    current_process = subprocess.run([main_exe], stdout=subprocess.PIPE, encoding="utf-8")
+    current_process = subprocess.run(main_exe_string, stdout=subprocess.PIPE)
     print(current_process.stdout)
-    current_process = subprocess.run([demo_exe], stdout=subprocess.PIPE, encoding="utf-8")
+    current_process = subprocess.run(demo_exe, stdout=subprocess.PIPE)
     print(current_process.stdout)
-    current_process = subprocess.run([test_exe], stdout=subprocess.PIPE, encoding="utf-8")
+    current_process = subprocess.run(test_exe, stdout=subprocess.PIPE)
     print(current_process.stdout)
     os.chdir(script_dir)
     print(os.getcwd())
