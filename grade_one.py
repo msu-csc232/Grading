@@ -54,8 +54,10 @@ if len(sys.argv) == expected_num_args:
             print(current_process.stdout)
 
     # Clone the assignment
-    git_clone_cmd = ["git", "clone", "git@github.com:msu-csc232/{0}.git".format(clone_dir)]
-    current_process = subprocess.run(git_clone_cmd, stdout=subprocess.PIPE, encoding="utf-8")
+    git_clone_cmd = ["git", "clone", "https://git@github.com/msu-csc232/{0}.git".format(clone_dir)]
+    print(git_clone_cmd)
+    #current_process = subprocess.run(git_clone_cmd, stdout=subprocess.PIPE, encoding="utf-8")
+    current_process = subprocess.run(git_clone_cmd, stdout=subprocess.PIPE)
     print(current_process.stdout)
 
     # Navigate into cloned directory
