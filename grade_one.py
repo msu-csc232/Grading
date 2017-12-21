@@ -14,6 +14,10 @@ username_arg_index = 3
 command_line_syntax_error_code = 2
 OS = platform.system()
 
+
+def make_wpath(path):
+    str.replace("/", "\\")
+
 if len(sys.argv) == expected_num_args:
     assignment = sys.argv[assignment_arg_index]
     if len(sys.argv[assignment_num_arg_index]) == 1:
@@ -22,21 +26,32 @@ if len(sys.argv) == expected_num_args:
         number = sys.argv[assignment_num_arg_index]
     username = sys.argv[username_arg_index]
 
-    repository = assignment + number + "-" + username
+    #repository = assignment + number + "-" + username
     script_dir = os.getcwd()
     clone_dir = assignment + number + "-" + username
 
     if assignment == "hw":
-        os.chdir(script_dir + "/Hw")
+        if OS == "Darwin" or OS == "Linux":
+            os.chdir(script_dir + "/Hw")
+        else:
+            os.chdir(script_dir + "\\Hw")
     elif assignment == "lab":
-        os.chdir(script_dir + "/Labs")
+        if OS == "Darwin" or OS == "Linux":
+            os.chdir(script_dir + "/Labs")
+        else:
+            os.chdir(script_dir + "\\Labs")
     else:
         sys.exit(command_line_syntax_error_code)
 
     if os.path.isdir(clone_dir):
-        rmdir_cmd = ["rm", "-rf", clone_dir]
-        current_process = subprocess.run(rmdir_cmd, stdout=subprocess.PIPE, encoding="utf-8")
-        print(current_process.stdout)
+        if OS == "Darwin" or OS == "Linux":
+            rmdir_cmd = ["rm", "-rf", clone_dir]
+            current_process = subprocess.run(rmdir_cmd, stdout=subprocess.PIPE, encoding="utf-8")
+            print(current_process.stdout)
+        else:
+            rmdir_cmd = ["rd", "/s", "/q", clone_dir]
+            current_process = subprocess.run(rmdir_cmd, stdout=subprocess.PIPE, encoding="utf-8")
+            print(current_process.stdout)
 
     # Clone the assignment
     git_clone_cmd = ["git", "clone", "git@github.com:msu-csc232/{0}.git".format(clone_dir)]
@@ -54,13 +69,19 @@ if len(sys.argv) == expected_num_args:
 
     # Navigate into a builder directory
     # At least two different paths have been specified in the past so we'll try either one...
-    if os.path.isdir("generator/unix"):
-        os.chdir("generator/unix")
-    elif os.path.isdir("build/unix"):
-        os.chdir("build/unix")
-    else:  # None of the expected paths exist so we'll make one to use
-        os.makedirs("tmp/unix")
-        os.chdir("tmp/unix")
+    if OS == "Darwin" or OS == "Linux":
+        if os.path.isdir("generator/unix"):
+            os.chdir("generator/unix")
+        elif os.path.isdir("build/unix"):
+            os.chdir("build/unix")
+        else:  # None of the expected paths exist so we'll make one to use
+            os.makedirs("tmp/unix")
+            os.chdir("tmp/unix")
+    #else: TODO: implement windows/linux branches
+    """
+    Will the name of the directory remain unix even on other operating systems? 
+    If not, what name should the directories be named
+    """
 
     # cmake -G "Unix Makefiles" ../..
     cmake_cmd = ["cmake", "-G", "Unix Makefiles", "../.."]
@@ -72,19 +93,34 @@ if len(sys.argv) == expected_num_args:
     current_process = subprocess.run(make_cmd, stdout=subprocess.PIPE, encoding="utf-8")
     print(current_process.stdout)
 
-    main_exe = Path("../../out/{0}{1}".format(assignment, number))
-    demo_exe = Path(".")  # dummy initialization
-    test_exe = Path(".")  # dummy initialization
-
-    if main_exe.is_file():
-        demo_exe = Path("../../out/{0}{1}Demo".format(assignment, number))
-        test_exe = Path("../../out/{0}{1}Test".format(assignment, number))
-    elif Path("../../out/{0}{1}".format("%s%s" % (assignment[0].upper(), assignment[1:]), number)).is_file():
-        # Just in case the assignment was capitalized in the CMakeLists.txt file...
-        assignment = "%s%s" % (assignment[0].upper(), assignment[1:])
+    if OS == "Darwin" or OS == "Linux":
         main_exe = Path("../../out/{0}{1}".format(assignment, number))
-        demo_exe = Path("../../out/{0}{1}Demo".format(assignment, number))
-        test_exe = Path("../../out/{0}{1}Test".format(assignment, number))
+        demo_exe = Path(".")  # dummy initialization
+        test_exe = Path(".")  # dummy initialization
+
+        if main_exe.is_file():
+            demo_exe = Path("../../out/{0}{1}Demo".format(assignment, number))
+            test_exe = Path("../../out/{0}{1}Test".format(assignment, number))
+        elif Path("../../out/{0}{1}".format("%s%s" % (assignment[0].upper(), assignment[1:]), number)).is_file():
+            # Just in case the assignment was capitalized in the CMakeLists.txt file...
+            assignment = "%s%s" % (assignment[0].upper(), assignment[1:])
+            main_exe = Path("../../out/{0}{1}".format(assignment, number))
+            demo_exe = Path("../../out/{0}{1}Demo".format(assignment, number))
+            test_exe = Path("../../out/{0}{1}Test".format(assignment, number))
+    else:
+        main_exe = Path("..\\..\\out\\{0}{1}".format(assignment, number))
+        demo_exe = Path(".")  # dummy initialization
+        test_exe = Path(".")  # dummy initialization
+
+        if main_exe.is_file():
+            demo_exe = Path("..\\..\\out/{0}{1}Demo".format(assignment, number))
+            test_exe = Path("..\\..\\out/{0}{1}Test".format(assignment, number))
+        elif Path("..\\..\\out/{0}{1}".format("%s%s" % (assignment[0].upper(), assignment[1:]), number)).is_file():
+            # Just in case the assignment was capitalized in the CMakeLists.txt file...
+            assignment = "%s%s" % (assignment[0].upper(), assignment[1:])
+            main_exe = Path("..\\..\\out/{0}{1}".format(assignment, number))
+            demo_exe = Path("..\\..\\out/{0}{1}Demo".format(assignment, number))
+            test_exe = Path("..\\..\\out/{0}{1}Test".format(assignment, number))
 
     # Execute the programs
     current_process = subprocess.run([main_exe], stdout=subprocess.PIPE, encoding="utf-8")
