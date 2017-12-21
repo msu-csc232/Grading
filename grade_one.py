@@ -17,7 +17,9 @@ print(OS)
 
 
 def make_wpath(path):
-    return path.replace("/", "\\")
+    for i in len(path):
+        if path[i] == "/":
+            path[i] = "\\"
 
 if len(sys.argv) == expected_num_args:
     assignment = sys.argv[assignment_arg_index]
@@ -71,15 +73,15 @@ if len(sys.argv) == expected_num_args:
 
     # Navigate into a builder directory
     # At least two different paths have been specified in the past so we'll try either one...
-    if OS == "Darwin" or OS == "Linux":
-        if os.path.isdir("generator/unix"):
-            os.chdir("generator/unix")
-        elif os.path.isdir("build/unix"):
-            os.chdir("build/unix")
-        else:  # None of the expected paths exist so we'll make one to use
-            os.makedirs("tmp/unix")
-            os.chdir("tmp/unix")
-    #else: TODO: implement windows/linux branches
+
+    if os.path.isdir("generator/unix"):
+        os.chdir("generator/unix")
+    elif os.path.isdir("build/unix"):
+        os.chdir("build/unix")
+    else:  # None of the expected paths exist so we'll make one to use
+        os.makedirs("tmp/unix")
+        os.chdir("tmp/unix")
+    #if OS == "Windows": TODO: implement windows/linux branches
     """
     Will the name of the directory remain unix even on other operating systems? 
     If not, what name should the directories be named
@@ -96,6 +98,7 @@ if len(sys.argv) == expected_num_args:
     print(current_process.stdout)
 
     main_exe = Path("../../out/{0}{1}".format(assignment, number))
+    print(main_exe)
     demo_exe = Path(".")  # dummy initialization
     test_exe = Path(".")  # dummy initialization
 
@@ -108,10 +111,6 @@ if len(sys.argv) == expected_num_args:
         main_exe = Path("../../out/{0}{1}".format(assignment, number))
         demo_exe = Path("../../out/{0}{1}Demo".format(assignment, number))
         test_exe = Path("../../out/{0}{1}Test".format(assignment, number))
-    if OS == "Windows":
-        main_exe_string = make_wpath(main_exe)
-        demo_exe = make_wpath(demo_exe)
-        test_exe = make_wpath(test_exe)
 
     # Execute the programs
     current_process = subprocess.run([main_exe], stdout=subprocess.PIPE, encoding="utf-8")
