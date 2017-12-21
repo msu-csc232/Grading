@@ -96,30 +96,29 @@ if len(sys.argv) == expected_num_args:
     print(current_process.stdout)
 
     main_exe = Path("../../out/{0}{1}".format(assignment, number))
-    main_exe_string = "../../out/{0}{1}".format(assignment, number)
     demo_exe = Path(".")  # dummy initialization
     test_exe = Path(".")  # dummy initialization
 
     if main_exe.is_file():
-        demo_exe = "../../out/{0}{1}Demo".format(assignment, number)
-        test_exe = "../../out/{0}{1}Test".format(assignment, number)
+        demo_exe = Path("../../out/{0}{1}Demo".format(assignment, number))
+        test_exe = Path("../../out/{0}{1}Test".format(assignment, number))
     elif Path("../../out/{0}{1}".format("%s%s" % (assignment[0].upper(), assignment[1:]), number)).is_file():
         # Just in case the assignment was capitalized in the CMakeLists.txt file...
         assignment = "%s%s" % (assignment[0].upper(), assignment[1:])
-        main_exe_string = "../../out/{0}{1}".format(assignment, number)
-        demo_exe = "../../out/{0}{1}Demo".format(assignment, number)
-        test_exe = "../../out/{0}{1}Test".format(assignment, number)
+        main_exe = Path("../../out/{0}{1}".format(assignment, number))
+        demo_exe = Path("../../out/{0}{1}Demo".format(assignment, number))
+        test_exe = Path("../../out/{0}{1}Test".format(assignment, number))
     if OS == "Windows":
-        main_exe_string = make_wpath(main_exe_string)
+        main_exe_string = make_wpath(main_exe)
         demo_exe = make_wpath(demo_exe)
         test_exe = make_wpath(test_exe)
 
     # Execute the programs
-    current_process = subprocess.run(main_exe_string, stdout=subprocess.PIPE, encoding="utf-8")
+    current_process = subprocess.run([main_exe], stdout=subprocess.PIPE, encoding="utf-8")
     print(current_process.stdout)
-    current_process = subprocess.run(demo_exe, stdout=subprocess.PIPE, encoding="utf-8")
+    current_process = subprocess.run([demo_exe], stdout=subprocess.PIPE, encoding="utf-8")
     print(current_process.stdout)
-    current_process = subprocess.run(test_exe, stdout=subprocess.PIPE, encoding="utf-8")
+    current_process = subprocess.run([test_exe], stdout=subprocess.PIPE, encoding="utf-8")
     print(current_process.stdout)
     os.chdir(script_dir)
     print(os.getcwd())
