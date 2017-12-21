@@ -73,15 +73,23 @@ if len(sys.argv) == expected_num_args:
 
     # Navigate into a builder directory
     # At least two different paths have been specified in the past so we'll try either one...
+    if OS == "Darwin" or OS == "Linux":
+        if os.path.isdir("generator/unix"):
+            os.chdir("generator/unix")
+        elif os.path.isdir("build/unix"):
+            os.chdir("build/unix")
+        else:  # None of the expected paths exist so we'll make one to use
+            os.makedirs("tmp/unix")
+            os.chdir("tmp/unix")
+    else:
+        if os.path.isdir("generator\\unix"):
+            os.chdir("generator\\unix")
+        elif os.path.isdir("build\\unix"):
+            os.chdir("build\\unix")
+        else:  # None of the expected paths exist so we'll make one to use
+            os.makedirs("tmp\\unix")
+            os.chdir("tmp\\unix")
 
-    if os.path.isdir("generator/unix"):
-        os.chdir("generator/unix")
-    elif os.path.isdir("build/unix"):
-        os.chdir("build/unix")
-    else:  # None of the expected paths exist so we'll make one to use
-        os.makedirs("tmp/unix")
-        os.chdir("tmp/unix")
-    #if OS == "Windows": TODO: implement windows/linux branches
     """
     Will the name of the directory remain unix even on other operating systems? 
     If not, what name should the directories be named
