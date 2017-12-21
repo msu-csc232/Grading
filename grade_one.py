@@ -46,18 +46,18 @@ if len(sys.argv) == expected_num_args:
     if os.path.isdir(clone_dir):
         if OS == "Darwin" or OS == "Linux":
             rmdir_cmd = ["rm", "-rf", clone_dir]
-            current_process = subprocess.run(rmdir_cmd, stdout=subprocess.PIPE)
+            current_process = subprocess.run(rmdir_cmd, stdout=subprocess.PIPE, encoding="utf-8")
             print(current_process.stdout)
         else:
             rmdir_cmd = ["rd", "/s", "/q", clone_dir]
-            current_process = subprocess.run(rmdir_cmd, stdout=subprocess.PIPE)
+            current_process = subprocess.run(rmdir_cmd, stdout=subprocess.PIPE, encoding="utf-8")
             print(current_process.stdout)
 
     # Clone the assignment
     print(username)
     git_clone_cmd = ["git", "clone", "https://github.com/msu-csc232/{0}.git".format(clone_dir)]
     print(git_clone_cmd)
-    current_process = subprocess.run(git_clone_cmd, stdout=subprocess.PIPE)
+    current_process = subprocess.run(git_clone_cmd, stdout=subprocess.PIPE, encoding="utf-8")
     print(current_process.stdout)
 
     # Navigate into cloned directory
@@ -65,7 +65,7 @@ if len(sys.argv) == expected_num_args:
 
     # Check out the develop branch
     git_checkout_cmd = ["git", "checkout", "develop"]
-    current_process = subprocess.run(git_checkout_cmd, stdout=subprocess.PIPE)
+    current_process = subprocess.run(git_checkout_cmd, stdout=subprocess.PIPE, encoding="utf-8")
     current_process_output = current_process.stdout
     print(current_process.stdout)
 
@@ -87,12 +87,12 @@ if len(sys.argv) == expected_num_args:
 
     # cmake -G "Unix Makefiles" ../..
     cmake_cmd = ["cmake", "-G", "Unix Makefiles", "../.."]
-    current_process = subprocess.run(cmake_cmd, stdout=subprocess.PIPE)
+    current_process = subprocess.run(cmake_cmd, stdout=subprocess.PIPE, encoding="utf-8")
     print(current_process.stdout)
 
     # make
     make_cmd = ["make"]
-    current_process = subprocess.run(make_cmd, stdout=subprocess.PIPE)
+    current_process = subprocess.run(make_cmd, stdout=subprocess.PIPE, encoding ="utf-8")
     print(current_process.stdout)
 
     main_exe = Path("../../out/{0}{1}".format(assignment, number))
@@ -115,11 +115,11 @@ if len(sys.argv) == expected_num_args:
         test_exe = make_wpath(test_exe)
 
     # Execute the programs
-    current_process = subprocess.run(main_exe_string, stdout=subprocess.PIPE)
+    current_process = subprocess.run(main_exe_string, stdout=subprocess.PIPE, encoding="utf-8")
     print(current_process.stdout)
-    current_process = subprocess.run(demo_exe, stdout=subprocess.PIPE)
+    current_process = subprocess.run(demo_exe, stdout=subprocess.PIPE, encoding="utf-8")
     print(current_process.stdout)
-    current_process = subprocess.run(test_exe, stdout=subprocess.PIPE)
+    current_process = subprocess.run(test_exe, stdout=subprocess.PIPE, encoding="utf-8")
     print(current_process.stdout)
     os.chdir(script_dir)
     print(os.getcwd())
