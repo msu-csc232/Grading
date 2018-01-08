@@ -52,8 +52,8 @@ if len(sys.argv) == expected_num_args:
             print(current_process.stdout)
         else:
             rmdir_cmd = ["rd", "/s", "/q", clone_dir]
-            current_process = subprocess.run(rmdir_cmd, stdout=subprocess.PIPE, encoding="utf-8")
-            print(current_process.stdout)
+            current_process = subprocess.run(rmdir_cmd, stdout=subprocess.PIPE, encoding="utf-8", shell=True)
+            print("preexisting file deleted")
 
     # Clone the assignment
     print(username)
@@ -128,7 +128,6 @@ if len(sys.argv) == expected_num_args:
     current_process = subprocess.run([test_exe], stdout=subprocess.PIPE, encoding="utf-8")
     print(current_process.stdout)
     os.chdir(script_dir)
-    print(os.getcwd())
 else:
     print("Usage:", sys.argv[0], "assignment number username")
     print("\twhere assignment = [hw|lab],\n\tnumber = [1|2|...|12]")
