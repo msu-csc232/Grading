@@ -15,12 +15,6 @@ command_line_syntax_error_code = 2
 OS = platform.system()
 print(OS)
 
-
-def make_wpath(path):
-    for i in len(path):
-        if path[i] == "/":
-            path[i] = "\\"
-
 if len(sys.argv) == expected_num_args:
     assignment = sys.argv[assignment_arg_index]
     if len(sys.argv[assignment_num_arg_index]) == 1:
