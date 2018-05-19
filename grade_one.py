@@ -3,6 +3,7 @@
 import os
 import subprocess
 import sys
+import platform
 
 from pathlib import Path
 
@@ -11,6 +12,8 @@ assignment_arg_index = 1
 assignment_num_arg_index = 2
 username_arg_index = 3
 command_line_syntax_error_code = 2
+OS = platform.system()
+print(OS)
 
 if len(sys.argv) == expected_num_args:
     assignment = sys.argv[assignment_arg_index]
@@ -20,24 +23,36 @@ if len(sys.argv) == expected_num_args:
         number = sys.argv[assignment_num_arg_index]
     username = sys.argv[username_arg_index]
 
-    repository = assignment + number + "-" + username
     script_dir = os.getcwd()
     clone_dir = assignment + number + "-" + username
 
     if assignment == "hw":
-        os.chdir(script_dir + "/Hw")
+        if OS == "Darwin" or OS == "Linux":
+            os.chdir(script_dir + "/Hw")
+        else:
+            os.chdir(script_dir + "\\Hw")
     elif assignment == "lab":
-        os.chdir(script_dir + "/Labs")
+        if OS == "Darwin" or OS == "Linux":
+            os.chdir(script_dir + "/Labs")
+        else:
+            os.chdir(script_dir + "\\Labs")
     else:
         sys.exit(command_line_syntax_error_code)
 
     if os.path.isdir(clone_dir):
-        rmdir_cmd = ["rm", "-rf", clone_dir]
-        current_process = subprocess.run(rmdir_cmd, stdout=subprocess.PIPE, encoding="utf-8")
-        print(current_process.stdout)
+        if OS == "Darwin" or OS == "Linux":
+            rmdir_cmd = ["rm", "-rf", clone_dir]
+            current_process = subprocess.run(rmdir_cmd, stdout=subprocess.PIPE, encoding="utf-8")
+            print(current_process.stdout)
+        else:
+            rmdir_cmd = ["rd", "/s", "/q", clone_dir]
+            current_process = subprocess.run(rmdir_cmd, stdout=subprocess.PIPE, encoding="utf-8", shell=True)
+            print("preexisting file deleted")
 
     # Clone the assignment
-    git_clone_cmd = ["git", "clone", "git@github.com:msu-csc232/{0}.git".format(clone_dir)]
+    print(username)
+    git_clone_cmd = ["git", "clone", "https://github.com/msu-csc232/{0}.git".format(clone_dir)]
+    print(git_clone_cmd)
     current_process = subprocess.run(git_clone_cmd, stdout=subprocess.PIPE, encoding="utf-8")
     print(current_process.stdout)
 
@@ -52,13 +67,27 @@ if len(sys.argv) == expected_num_args:
 
     # Navigate into a builder directory
     # At least two different paths have been specified in the past so we'll try either one...
-    if os.path.isdir("generator/unix"):
-        os.chdir("generator/unix")
-    elif os.path.isdir("build/unix"):
-        os.chdir("build/unix")
-    else:  # None of the expected paths exist so we'll make one to use
-        os.makedirs("tmp/unix")
-        os.chdir("tmp/unix")
+    if OS == "Darwin" or OS == "Linux":
+        if os.path.isdir("generator/unix"):
+            os.chdir("generator/unix")
+        elif os.path.isdir("build/unix"):
+            os.chdir("build/unix")
+        else:  # None of the expected paths exist so we'll make one to use
+            os.makedirs("tmp/unix")
+            os.chdir("tmp/unix")
+    else:
+        if os.path.isdir("generator\\unix"):
+            os.chdir("generator\\unix")
+        elif os.path.isdir("build\\unix"):
+            os.chdir("build\\unix")
+        else:  # None of the expected paths exist so we'll make one to use
+            os.makedirs("tmp\\unix")
+            os.chdir("tmp\\unix")
+
+    """
+    Will the name of the directory remain unix even on other operating systems? 
+    If not, what name should the directories be named
+    """
 
     # cmake -G "Unix Makefiles" ../..
     cmake_cmd = ["cmake", "-G", "Unix Makefiles", "../.."]
@@ -67,10 +96,11 @@ if len(sys.argv) == expected_num_args:
 
     # make
     make_cmd = ["make"]
-    current_process = subprocess.run(make_cmd, stdout=subprocess.PIPE, encoding="utf-8")
+    current_process = subprocess.run(make_cmd, stdout=subprocess.PIPE, encoding ="utf-8")
     print(current_process.stdout)
 
     main_exe = Path("../../out/{0}{1}".format(assignment, number))
+    print(main_exe)
     demo_exe = Path(".")  # dummy initialization
     test_exe = Path(".")  # dummy initialization
 
@@ -92,7 +122,6 @@ if len(sys.argv) == expected_num_args:
     current_process = subprocess.run([test_exe], stdout=subprocess.PIPE, encoding="utf-8")
     print(current_process.stdout)
     os.chdir(script_dir)
-    print(os.getcwd())
 else:
     print("Usage:", sys.argv[0], "assignment number username")
     print("\twhere assignment = [hw|lab],\n\tnumber = [1|2|...|12]")
